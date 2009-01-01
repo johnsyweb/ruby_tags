@@ -2,10 +2,10 @@
 #-*-ruby-*-
 # A script to run ctags on all .rb files in a project. Can be run on
 # the current dir, called from a git callback, or install itself as a
-# git post-merge callback.
+# git post-merge and post-commit callback.
 
 CTAGS = '/opt/local/bin/ctags'
-HOOK = 'post-merge'
+HOOKS = %w{ post-merge post-commit }
 HOOKS_DIR = '.git/hooks'
 
 def install
@@ -14,22 +14,25 @@ def install
     exit 1
   end
   
-  full_hook = "#{HOOKS_DIR}/#{HOOK}"
-  if File.exists?(full_hook)
-    $stderr.print "A file already exists at #{full_hook}; exiting.\n"
-    exit 1
-  end
-  
-  print "Linking #{__FILE__} to #{full_hook}\n"
-  %x{ln -s #{__FILE__}  #{full_hook}}
+  HOOKS.each { |hook| install_hook("#{HOOKS_DIR}/#{hook}") }
 end
 
 def run_tags(dir)
   if File.executable?(CTAGS) and File.writable?(dir)
-    %x{find #{dir} -name \*.rb | #{CTAGS} -e -f #{dir}/TAGS -L -}
+    %x{find #{dir} -name \*.rb | #{CTAGS} -e -f #{dir}/TAGS -L - 2>>/dev/null}
   else
     $stderr.print "FAILED to write TAGS file to #{dir}\n"
   end
+end
+
+def install_hook(hook)
+  if File.exists?(hook)
+    $stderr.print "A file already exists at #{hook}, and will NOT be replaced.\n"
+    return
+  end
+  
+  print "Linking #{__FILE__} to #{hook}\n"
+  %x{ln -s #{__FILE__}  #{hook}}
 end
 
 if ARGV.first == '-i'
