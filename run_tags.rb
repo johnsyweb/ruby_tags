@@ -19,7 +19,7 @@ end
 
 def run_tags(dir)
   if File.executable?(CTAGS) and File.writable?(dir)
-    %x{find #{dir} -name \*.rb | #{CTAGS} -e -f #{dir}/TAGS -L - 2>>/dev/null}
+    %x{find #{dir} -name \\*.rb | #{CTAGS} -e -f #{dir}/TAGS -L - 2>>/dev/null}
   else
     $stderr.print "FAILED to write TAGS file to #{dir}\n"
   end
