@@ -5,7 +5,7 @@
 # git post-merge and post-commit callback.
 
 CTAGS = '/opt/local/bin/ctags'
-HOOKS = %w{ post-merge post-commit }
+HOOKS = %w{ post-merge post-commit post-checkout }
 HOOKS_DIR = '.git/hooks'
 
 def install
