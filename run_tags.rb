@@ -17,9 +17,9 @@ def install
   HOOKS.each { |hook| install_hook("#{HOOKS_DIR}/#{hook}") }
 end
 
-def run_tags(dir)
+def run_tags(dir, run_in_background = false)
   if File.executable?(CTAGS) and File.writable?(dir)
-    %x{find #{dir} -name \\*.rb | #{CTAGS} -e -f #{dir}/TAGS -L - 2>>/dev/null}
+    system("find #{dir} -name \*.rb | #{CTAGS} -e -f #{dir}/TAGS -L - 2>>/dev/null #{run_in_background ? '&' : ''}")
   else
     $stderr.print "FAILED to write TAGS file to #{dir}\n"
   end
@@ -39,5 +39,5 @@ if ARGV.first == '-i'
   install
 else
   # if GIT_DIR is set, we are being called from git
-  run_tags( ENV['GIT_DIR'] ? "#{ENV['GIT_DIR']}/.." : Dir.pwd )
+  run_tags( ENV['GIT_DIR'] ? "#{ENV['GIT_DIR']}/.." : Dir.pwd, ENV['GIT_DIR'] )
 end
