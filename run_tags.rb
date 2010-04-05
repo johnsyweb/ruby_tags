@@ -19,7 +19,8 @@ end
 
 def run_tags(dir, run_in_background = false)
   if File.executable?(CTAGS) and File.writable?(dir)
-    cmd = "find #{dir} -name \*.rb | #{CTAGS} -e -f #{dir}/TAGS -L - 2>>/dev/null #{run_in_background ? '&' : ''}"
+    cmd = "find #{dir} -name \*.rb | #{CTAGS} -e -f #{dir}/TAGS -L - 2>>/dev/null "
+    cmd << '&' if run_in_background
     #$stderr.print "calling #{cmd}\n"
     system cmd
   else
