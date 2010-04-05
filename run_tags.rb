@@ -19,7 +19,9 @@ end
 
 def run_tags(dir, run_in_background = false)
   if File.executable?(CTAGS) and File.writable?(dir)
-    system("find #{dir} -name \*.rb | #{CTAGS} -e -f #{dir}/TAGS -L - 2>>/dev/null #{run_in_background ? '&' : ''}")
+    cmd = "find #{dir} -name \*.rb | #{CTAGS} -e -f #{dir}/TAGS -L - 2>>/dev/null #{run_in_background ? '&' : ''}"
+    #$stderr.print "calling #{cmd}\n"
+    system cmd
   else
     $stderr.print "FAILED to write TAGS file to #{dir}\n"
   end
@@ -38,6 +40,5 @@ end
 if ARGV.first == '-i'
   install
 else
-  # if GIT_DIR is set, we are being called from git
-  run_tags( ENV['GIT_DIR'] ? "#{ENV['GIT_DIR']}/.." : Dir.pwd, ENV['GIT_DIR'] )
+  run_tags Dir.pwd, HOOKS.include?(File.basename(__FILE__))
 end
