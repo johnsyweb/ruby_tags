@@ -7,6 +7,11 @@
 CTAGS = %x{ which ctags }.chomp
 HOOKS = %w{ post-merge post-commit post-checkout }
 HOOKS_DIR = '.git/hooks'
+VIM_MODE = /_vim/.match($0)
+TAGS_FILE = VIM_MODE ? 'tags' : 'TAGS'
+EMACS_FLAG = VIM_MODE ? '' : '-e'
+
+DEBUG_MODE = false
 
 def install
   if !File.writable?(HOOKS_DIR)
@@ -19,12 +24,12 @@ end
 
 def run_tags(dir, run_in_background = false)
   if File.executable?(CTAGS) and File.writable?(dir)
-    cmd = "find #{dir} -name \\\*.rb | #{CTAGS} -e -f #{dir}/TAGS -L - 2>>/dev/null "
+    cmd = "find #{dir} -name \\\*.rb | #{CTAGS} #{EMACS_FLAG} -f #{dir}/#{TAGS_FILE} -L - 2>>/dev/null "
     cmd << '&' if run_in_background
-    #$stderr.print "calling #{cmd}\n"
+    $stderr.print "[#{$0}] calling #{cmd}\n" if DEBUG_MODE
     system cmd
   else
-    $stderr.print "FAILED to write TAGS file to #{dir}\n"
+    $stderr.print "[#{$0}] #{CTAGS} failed to write #{dir}/#{TAGS_FILE}\n"
   end
 end
 
