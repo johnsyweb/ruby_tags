@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #-*-ruby-*-
 # A script to run ctags on all .rb files in a project. Can be run on
 # the current dir, called from a git callback, or install itself as a
